@@ -1,4 +1,14 @@
 class State(object):
+    AI = "⚪"
+    PLAYER = "⚫"
+    FIELDS_AROUND = {
+        0: [1,2], 1: [0,2,9], 2: [1,4], 3: [0,5,11],
+        4: [2,7,12], 5: [3,6], 6: [5,7,14], 7: [4,6],
+        8: [9,11], 9: [1,8,10,17], 10: [9,12], 11: [3,8,13,19],
+        12: [4,10,15,20], 13: [11,14], 14: [6,13,15,22], 15: [12,14],
+        16: [17,19], 17: [9,16,18], 18: [17,20], 19: [11,16,21],
+        20: [12,18,23], 21: [19,22], 22: [14,21,23], 23: [20,22]
+    }
 
     def __init__(self):
         self.board = []
@@ -24,8 +34,21 @@ class State(object):
 
         return True
     
-    def is_end(self): #Treba da dodam
-        pass
+    def is_end(self): #vraca format bool, pobednik
+        player = 0
+        ai = 0
+        for i in range(0,24):
+            if self.board[i] == "⚫":
+                player += 1
+            elif self.board[i] == "⚪":
+                ai += 1
+        if ai == 2:
+            return True, "PLAYER"
+        elif player == 2:
+            return True, "AI"
+        else:
+            return False, None      
+
 
     def print_node(self,arr,index):
         if index < 10:
@@ -36,7 +59,7 @@ class State(object):
         if arr[index] == "X":
             return "X[{}]".format(i)
         else:
-            return "  {}  ".format(arr[index])
+            return " {}  ".format(arr[index])
 
 
     def __str__(self):
@@ -48,7 +71,7 @@ class State(object):
             + "\n" + "  |" + " "*7 + "|" + " "*6 + self.print_node(self.board,16) + "-"*5 + self.print_node(self.board,17) + "-"*5 + self.print_node(self.board,18) + " "*6 + "|" + " "*7 + "|"  \
             + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" \
             + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" \
-            + "\n" + self.print_node(self.board,3) + "-"*3 + self.print_node(self.board,11) + "-"*4 + self.print_node(self.board,19) + " "*15 + self.print_node(self.board,20) + "-"*4 + self.print_node(self.board,21) + "-"*3 + self.print_node(self.board,22) \
+            + "\n" + self.print_node(self.board,3) + "-"*3 + self.print_node(self.board,11) + "-"*4 + self.print_node(self.board,19) + " "*15 + self.print_node(self.board,20) + "-"*4 + self.print_node(self.board,12) + "-"*3 + self.print_node(self.board,4) \
             + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" \
             + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" \
             + "\n" + "  |" + " "*7 + "|" + " "*6 + self.print_node(self.board,21) + "-"*5 + self.print_node(self.board,22) + "-"*5 + self.print_node(self.board,23) + " "*6 + "|" + " "*7 + "|"  \
@@ -62,8 +85,13 @@ class State(object):
 
 if __name__ == "__main__":
     state = State()
-    state.set_value(0,"P")
-    state.set_value(9,"C")
-    state.set_value(17,"P")
+    # state.set_value(0,state.AI)
+    # state.set_value(9,state.PLAYER)
+    # state.set_value(8,state.PLAYER)
+    # state.set_value(15,state.PLAYER)
+    # state.set_value(10,state.PLAYER)
+    # state.set_value(17,state.AI)
+    # state.set_value(14,state.AI)
+    # state.set_value(11,state.AI)
     # print(state.is_move_valid(25,"x"))
     print(state)
