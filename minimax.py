@@ -1,10 +1,10 @@
 from cmath import inf
-from http.client import CONTINUE
 from state import State
 import evaluation
 import copy
+import time
 
-DEPTH = 2
+DEPTH = 4
 ALPHA = float(-inf)
 BETA = float(inf)
 
@@ -52,14 +52,13 @@ class Game(object):
     def max(self, depth, alpha, beta):
         max_eval = float(-inf)
         max_index = None
-        remove_index = None
         result = False
 
         if self.phase != 1:
             result, winner = self.current_state.is_end()
 
         if depth == 0 or result == True:
-            return evaluation.eval(self.current_state, self.state_before, self.phase), max_index, remove_index
+            return evaluation.eval(self.current_state, self.state_before, self.phase), max_index
 
         for i in range(0,24):
             if self.current_state.get_value(i) == "X":
@@ -69,36 +68,34 @@ class Game(object):
 
 
                 if evaluation.closed_mill(self.current_state, self.state_before) == 1:
-                    eval, index, rem = self.min_remove(depth-1,alpha,beta)
+                    eval, index = self.min_remove(depth-1,alpha,beta)
                 else:
-                    eval, index, rem = self.min(depth-1,alpha,beta)
+                    eval, index = self.min(depth-1,alpha,beta)
 
                 if eval > max_eval:
                     max_eval = eval
                     max_index = i
-                    remove_index = index
 
                 alpha = max(alpha, eval)
 
                 self.current_state.set_value(i, "X")
 
             if max_eval >= beta:
-                return max_eval, max_index, remove_index
+                return max_eval, max_index
 
-        return max_eval, max_index, remove_index
+        return max_eval, max_index
 
 
     def min(self, depth, alpha, beta):
         min_eval = float(+inf)
         min_index = None
-        remove_index = None
         result = False
 
         if self.phase != 1:
             result, winner = self.current_state.is_end()
 
         if depth == 0 or result == True:
-            return evaluation.eval(self.current_state, self.state_before, self.phase), min_index, remove_index
+            return evaluation.eval(self.current_state, self.state_before, self.phase), min_index
 
         for i in range(0,24):
             if self.current_state.get_value(i) == "X":
@@ -107,22 +104,21 @@ class Game(object):
                 # print(self.current_state)   #OBRISATI KASNIJE
 
                 if evaluation.closed_mill(self.current_state, self.state_before) == -1:
-                    eval, index, rem = self.max_remove(depth-1,alpha,beta)
+                    eval, index = self.max_remove(depth-1,alpha,beta)
                 else:
-                    eval, index, rem = self.max(depth-1,alpha,beta)
+                    eval, index = self.max(depth-1,alpha,beta)
 
                 if eval < min_eval:
                     min_eval = eval
                     min_index = i
-                    remove_index = index
                 beta = min(beta, eval)
 
                 self.current_state.set_value(i, "X")
 
             if min_eval <= alpha:
-                return min_eval, min_index, remove_index
+                return min_eval, min_index
                 
-        return min_eval, min_index, remove_index
+        return min_eval, min_index
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -132,7 +128,6 @@ class Game(object):
     def max_remove(self, depth, alpha, beta):
         max_eval = float(-inf)
         max_index = None
-        remove_index = None
         result = False
         # enemy = self.change_player(self.player_turn)
         free_figures = evaluation.are_there_non_mill_figures(self.current_state,self.current_state.PLAYER)  #Bool vrednost koja pokazuje da li ima figura koje nisu u mici
@@ -141,7 +136,7 @@ class Game(object):
             result, winner = self.current_state.is_end()
 
         if depth == 0 or result == True:
-            return evaluation.eval(self.current_state, self.state_before, self.phase), max_index, remove_index
+            return evaluation.eval(self.current_state, self.state_before, self.phase), max_index
 
         for i in range(0,24):
             if self.current_state.get_value(i) == self.current_state.PLAYER:
@@ -154,26 +149,24 @@ class Game(object):
                 self.current_state.black_figures -= 1
                 # print(self.current_state)   #OBRISATI KASNIJE
 
-                eval, index, rem = self.min(depth-1,alpha,beta)
+                eval, index = self.min(depth-1,alpha,beta)
 
                 if eval > max_eval:
                     max_eval = eval
                     max_index = i
-                    remove_index = index
                 alpha = max(alpha, eval)
 
                 self.current_state.set_value(i, self.current_state.PLAYER)
                 self.current_state.black_figures += 1
 
             if max_eval >= beta:
-                return max_eval, max_index, remove_index
-        return max_eval, max_index, remove_index
+                return max_eval, max_index
+        return max_eval, max_index
 
 
     def min_remove(self, depth, alpha, beta):
         min_eval = float(+inf)
         min_index = None
-        remove_index = None
         result = False
         # enemy = self.change_player(self.player_turn)
         free_figures = evaluation.are_there_non_mill_figures(self.current_state,self.current_state.AI)  #Bool vrednost koja pokazuje da li ima figura koje nisu u mici
@@ -182,7 +175,7 @@ class Game(object):
             result, winner = self.current_state.is_end()
 
         if depth == 0 or result == True:
-            return evaluation.eval(self.current_state, self.state_before, self.phase), min_index, remove_index
+            return evaluation.eval(self.current_state, self.state_before, self.phase), min_index
 
         for i in range(0,24):
             if self.current_state.get_value(i) == self.current_state.AI:
@@ -195,21 +188,20 @@ class Game(object):
                 self.current_state.white_figures -= 1
                 # print(self.current_state)   #OBRISATI KASNIJE
 
-                eval, index, rem = self.max(depth-1,alpha,beta)
+                eval, index= self.max(depth-1,alpha,beta)
 
                 if eval < min_eval:
                     min_eval = eval
                     min_index = i
-                    remove_index = index
                 beta = min(beta, eval)
 
                 self.current_state.set_value(i, self.current_state.AI)
-                self.current_state.white_figures -= 1
+                self.current_state.white_figures += 1
 
             if min_eval <= alpha:
-                return min_eval, min_index, remove_index
+                return min_eval, min_index
                 
-        return min_eval, min_index, remove_index
+        return min_eval, min_index
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -230,6 +222,10 @@ class Game(object):
                 try:
                     user_input = int(user_input)
                     if self.current_state.get_value(user_input) == State.AI:
+                        free_figures = evaluation.are_there_non_mill_figures(self.current_state,self.current_state.AI)
+                        if free_figures and evaluation.is_mill(self.current_state,self.current_state.AI,user_input):
+                            print("Ne možete pojesti ovu figuru!")
+                            continue
                         self.remove_figure(user_input)
                         break
                     else:
@@ -243,12 +239,18 @@ class Game(object):
 
     def phase_one_ai(self):
         self.state_before = copy.deepcopy(self.current_state)
-        eval, index, remove_index = self.max(DEPTH, ALPHA, BETA)
+
+        start_time = time.time()
+        eval, index = self.max(DEPTH, ALPHA, BETA)
+        print("--- %s seconds ---" % (time.time() - start_time))
+
+       
         self.current_state.set_value(index, self.current_state.AI)
 
         if evaluation.is_mill(self.current_state, self.current_state.AI, index):
             print(self.current_state)
-            self.remove_figure(remove_index)       
+            eval2, index2 = self.max_remove(DEPTH - 1, ALPHA, BETA)
+            self.remove_figure(index2)       
         print(self.current_state)
 
             
@@ -269,11 +271,11 @@ class Game(object):
             self.phase_one_ai()
 
         #FAZA 2
-        while True:
-            result, winner = self.current_state.is_end()
+        # while True:
+        #     result, winner = self.current_state.is_end()
 
-            if result == True:
-                print("*"*30 + "\n\n" "Pobednik je: " + winner + "!\n\n" + "*"*30)
+        #     if result == True:
+        #         print("*"*30 + "\n\n" "Pobednik je: " + winner + "!\n\n" + "*"*30)
 
 
 

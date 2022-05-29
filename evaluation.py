@@ -183,7 +183,6 @@ def winning_configuration(state):
 def eval(state, state_before, phase):
 
     if phase == 1:    #18 26 1 6 21 7
-        print(state)
         evaluation = \
             18 * closed_mill(state, state_before) + \
             26 * mill_diff(state) + \
