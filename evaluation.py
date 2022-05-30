@@ -12,7 +12,9 @@
 #     (A 3-piece configuration is one to which a piece can be added in which one of two ways to close a morris)
 # 7 - Double morris: Difference between number of yours and yours opponent’s double morrises 
 #     (A double morris is one in which two morrises share a common piece)
-# 8 - Winning configuration: 1 if the state is winning for the player, -1 if losing, 0 otherwise
+# 8 - Opened Morris: Difference between number of yours and yours opponent's opened morrises
+#     (An open morris is one in which 1 piece is missing and it is at the node nearby)
+# 9 - Winning configuration: 1 if the state is winning for the player, -1 if losing, 0 otherwise
 
 
 def change_player(state,player):
@@ -169,6 +171,35 @@ def diff_double_mills(state):
 
 
 #HEURISTIKA 8
+#Razlika u broju otvorenih mica
+#(An open morris is one in which 1 piece is missing and it is at the node nearby)
+def num_of_opened_mills(state,player):
+    opened_mills = 0
+    for mill in state.SINGLE_MILLS:
+        player_figures = 0
+        empty_node = 0
+        empty_index = None
+        for i in mill:
+            if state.get_value(i) == player:
+                player_figures += 1
+            elif state.get_value(i) == "X":
+                empty_node += 1
+                empty_index = i
+            else:
+                continue
+        if player_figures == 2 and empty_node == 1:
+            for neighbour in state.NEIGHBOURS[empty_index]:
+                if state.get_value(neighbour) == player:
+                    opened_mills += 1
+                    break
+    return opened_mills
+
+
+def opened_mills_diff(state):
+    return num_of_opened_mills(state, state.AI) - num_of_opened_mills(state, state.PLAYER) 
+
+
+#HEURISTIKA 9
 #Pobednicka konfiguracija (1 ako je pobeda, -1 poraz, u suprotnom 0)
 def winning_configuration(state):
     result,winner = state.is_end()
@@ -190,6 +221,16 @@ def eval(state, state_before, phase):
             6 * figures_diff(state) + \
             21 * diff_two_piece_config(state) + \
             7 * diff_three_piece_config(state)
+    elif phase == 2:    #42 28 16 8 24 19 949  
+        evaluation = \
+            42 * closed_mill(state, state_before) + \
+            28 * mill_diff(state) + \
+            16 * diff_blocked_figures(state) + \
+            8 * figures_diff(state) + \
+            24 * opened_mills_diff(state) + \
+            19 * diff_double_mills(state) + \
+            949 * winning_configuration(state)
+            
     return evaluation
 
 

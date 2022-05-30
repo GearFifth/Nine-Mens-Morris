@@ -72,14 +72,13 @@ class State(object):
         [23,22,14,6,21], [21,22,14,23,6], [21,19,11,3,16], [16,19,11,21,3],
     )
 
-    num_of_mills = {"PLAYER": 0, "AI": 0}
-
     def __init__(self):
         self.board = []
         for i in range(0, 24):
             self.board.append('X')
         self.black_figures = 9      #PLAYER
         self.white_figures = 9      #AI
+        self.placed_figures = {self.PLAYER: 0, self.AI: 0}
 
     def get_value(self, i):
         return self.board[int(i)]
@@ -105,11 +104,6 @@ class State(object):
     #Uslovi za kraj - nema mogucih poteza(sve figure blokirane)
 
     def is_end(self): #vraca format bool, pobednik
-        # for i in range(0,24):
-        #     if self.board[i] == "⚫":
-        #         player += 1
-        #     elif self.board[i] == "⚪":
-        #         ai += 1
         white_blocked, black_blocked = evaluation.blocked_figures(self)
         if self.white_figures == 2 or self.white_figures == white_blocked:
             return True, "PLAYER"
@@ -132,23 +126,49 @@ class State(object):
 
 
     def __str__(self):
-        ret = "\n"*3 + self.print_node(self.board,0) + "-"*22 + self.print_node(self.board,1) + "-"*22 + self.print_node(self.board,2) \
-            + "\n" + "  |" + " "*26 + "|" + " "*26 + "|" \
-            + "\n" + "  |" + " "*5 + self.print_node(self.board,8) + "-"*14 + self.print_node(self.board,9) + "-"*14 + self.print_node(self.board,10) + " "*5 + "|" \
-            + "\n" + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|" \
-            + "\n" + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|" \
-            + "\n" + "  |" + " "*7 + "|" + " "*6 + self.print_node(self.board,16) + "-"*5 + self.print_node(self.board,17) + "-"*5 + self.print_node(self.board,18) + " "*6 + "|" + " "*7 + "|"  \
-            + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" \
-            + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" \
-            + "\n" + self.print_node(self.board,3) + "-"*3 + self.print_node(self.board,11) + "-"*4 + self.print_node(self.board,19) + " "*15 + self.print_node(self.board,20) + "-"*4 + self.print_node(self.board,12) + "-"*3 + self.print_node(self.board,4) \
-            + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" \
-            + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" \
-            + "\n" + "  |" + " "*7 + "|" + " "*6 + self.print_node(self.board,21) + "-"*5 + self.print_node(self.board,22) + "-"*5 + self.print_node(self.board,23) + " "*6 + "|" + " "*7 + "|"  \
-            + "\n" + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|" \
-            + "\n" + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|" \
-            + "\n" + "  |" + " "*5 + self.print_node(self.board,13) + "-"*14 + self.print_node(self.board,14) + "-"*14 + self.print_node(self.board,15) + " "*5 + "|" \
-            + "\n" + "  |" + " "*26 + "|" + " "*26 + "|" \
-            + "\n" + self.print_node(self.board,5) + "-"*22 + self.print_node(self.board,6) + "-"*22 + self.print_node(self.board,7) + "\n"
+        # ret = "\n"*3 + self.print_node(self.board,0) + "-"*22 + self.print_node(self.board,1) + "-"*22 + self.print_node(self.board,2) + " "*20  + "X[00]" + "-"*22 + "X[01]" + "-"*22 + "X[02]"\
+        #     + "\n" + "  |" + " "*26 + "|" + " "*26 + "|" + " "*22 + "  |" + " "*26 + "|" + " "*26 + "|" + " " \
+        #     + "\n" + "  |" + " "*5 + self.print_node(self.board,8) + "-"*14 + self.print_node(self.board,9) + "-"*14 + self.print_node(self.board,10) + " "*5 + "|" + " "*22 + "  |" + " "*5 + "X[08]" + "-"*14 + "X[09]" + "-"*14 + "X[10]" + " "*5 + "|"\
+        #     + "\n" + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|" + " "*22 + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|"\
+        #     + "\n" + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|" + " "*22 + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|"\
+        #     + "\n" + "  |" + " "*7 + "|" + " "*6 + self.print_node(self.board,16) + "-"*5 + self.print_node(self.board,17) + "-"*5 + self.print_node(self.board,18) + " "*6 + "|" + " "*7 + "|" + " "*22 + "  |" + " "*7 + "|" + " "*6 + "X[16]" + "-"*5 + "X[17]" + "-"*5 + "X[18]" + " "*6 + "|" + " "*7 + "|" \
+        #     + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" + " "*22 + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|"\
+        #     + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" + " "*22 + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|"\
+        #     + "\n" + self.print_node(self.board,3) + "-"*3 + self.print_node(self.board,11) + "-"*4 + self.print_node(self.board,19) + " "*15 + self.print_node(self.board,20) + "-"*4 + self.print_node(self.board,12) + "-"*3 + self.print_node(self.board,4) + " "*20 + "X[03]" + "-"*3 + "X[11]" + "-"*4 + "X[19]" + " "*15 + "X[20]" + "-"*4 + "X[12]" + "-"*3 + "X[04]"\
+        #     + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" + " "*20\
+        #     + "\n" + "  |" + " "*7 + "|" + " "*8 + "|" + " "*19 + "|" + " "*8 + "|" + " "*7 + "|" + " "*20\
+        #     + "\n" + "  |" + " "*7 + "|" + " "*6 + self.print_node(self.board,21) + "-"*5 + self.print_node(self.board,22) + "-"*5 + self.print_node(self.board,23) + " "*6 + "|" + " "*7 + "|" + " "*20 \
+        #     + "\n" + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|" + " "*20\
+        #     + "\n" + "  |" + " "*7 + "|" + " "*18 + "|" + " "*18 + "|" + " "*7 + "|" + " "*20\
+        #     + "\n" + "  |" + " "*5 + self.print_node(self.board,13) + "-"*14 + self.print_node(self.board,14) + "-"*14 + self.print_node(self.board,15) + " "*5 + "|" + " "*20 \
+        #     + "\n" + "  |" + " "*26 + "|" + " "*26 + "|" + " "*20 \
+        #     + "\n" + self.print_node(self.board,5) + "-"*22 + self.print_node(self.board,6) + "-"*22 + self.print_node(self.board,7) + "\n" + " "*20
+
+        arr = []
+        for i in range(0,24):
+            arr.append(self.print_node(self.board,i))
+        
+
+        ret = " \n\n                                    TRENUTNA TABLA                                                                  PRAZNA TABLA\n\n\
+              {0}----------------------{1}----------------------{2}                    X[00]----------------------X[01]----------------------X[02] \n\
+                |                          |                          |                        |                          |                          | \n\
+                |     {8}--------------{9}--------------{10}     |                        |     X[08]--------------X[09]--------------X[10]     | \n\
+                |       |                  |                  |       |                        |       |                  |                  |       | \n\
+                |       |                  |                  |       |                        |       |                  |                  |       | \n\
+                |       |      {16}-----{17}-----{18}      |       |                        |       |      X[16]-----X[17]-----X[18]      |       | \n\
+                |       |        |                   |        |       |                        |       |        |                   |        |       | \n\
+                |       |        |                   |        |       |                        |       |        |                   |        |       | \n\
+              {3}---{11}----{19}               {20}----{12}---{4}                    X[03]---X[11]----X[19]               X[20]----X[12]---X[04] \n\
+                |       |        |                   |        |       |                        |       |        |                   |        |       | \n\
+                |       |        |                   |        |       |                        |       |        |                   |        |       | \n\
+                |       |      {21}-----{22}-----{23}      |       |                        |       |      X[21]-----X[22]-----X[23]      |       | \n\
+                |       |                  |                  |       |                        |       |                  |                  |       | \n\
+                |       |                  |                  |       |                        |       |                  |                  |       | \n\
+                |     {13}--------------{14}--------------{15}     |                        |     X[13]--------------X[14]--------------X[15]     | \n\
+                |                          |                          |                        |                          |                          | \n\
+              {5}----------------------{6}----------------------{7}                    X[05]----------------------X[06]----------------------X[07] \n\n\
+                ".format(*arr)
+
         return ret
 
 if __name__ == "__main__":
