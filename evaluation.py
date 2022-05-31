@@ -25,8 +25,11 @@ def change_player(state,player):
 
 def are_there_non_mill_figures(state,player):
     for i in range(0,24):
-        if not is_mill(state,player,i): #Cim naidje na jednu figuru koja nije u mici prekida pretragu
-            return True
+        if state.get_value(i) == player:
+            if not is_mill(state,player,i): #Cim naidje na jednu figuru koja nije u mici prekida pretragu
+                return True
+        else: 
+            continue
     return False
 
 
@@ -36,19 +39,41 @@ def are_there_non_mill_figures(state,player):
 def closed_mill(state, state_before):
     # enemy = change_player(state,player)
     
-    mills_before = count_mills(state_before, state.AI)
-    mills_now = count_mills(state, state.AI)
+    mills_before = get_list_of_mills(state_before, state.AI)
+    mills_now = get_list_of_mills(state, state.AI)
 
-    enemy_mills_before = count_mills(state_before, state.PLAYER)
-    enemy_mills_now = count_mills(state, state.PLAYER)
+    enemy_mills_before = get_list_of_mills(state_before, state.PLAYER)
+    enemy_mills_now = get_list_of_mills(state, state.PLAYER)
 
-    if mills_now > mills_before:
-        return 1
-    elif enemy_mills_now > enemy_mills_before:
-        return -1
-    else:
-        return 0
+    for mill in mills_now:
+        if mill not in mills_before:
+            return 1
 
+    for mill in enemy_mills_now:
+        if mill not in enemy_mills_before:
+            return -1
+
+    return 0
+
+    # if len(mills_now) > len(mills_before):
+    #     return 1
+    # elif len(enemy_mills_now) > len(enemy_mills_before):
+    #     return -1
+    # else:
+
+    #     return 0
+
+def get_list_of_mills(state,player):
+    mills = []
+    for mill in state.SINGLE_MILLS:
+        count = 0
+        for i in mill:
+            if state.get_value(i) != "X":
+                if state.get_value(i) == player:
+                    count += 1    
+        if count == 3:
+            mills.append(mill)      
+    return mills
 
 #Proverava da li je spojen mill na odredjenoj poziciji 
 def is_mill(state,player,index):       
@@ -61,7 +86,6 @@ def is_mill(state,player,index):
             if state.get_value(i) == player:
                 count += 1
         if count == 3: #spojen mill
-            # state.num_of_mills[player] += 1 #Ako je formiran mill povecavam broj millova
             return True         
     return False
 
@@ -155,15 +179,42 @@ def diff_three_piece_config(state):
 
 #HEURISTIKA 7
 #Razlika u broju duplih mica
+# def num_of_double_mills(state,player):
+#     double_mills = 0
+#     for mill in state.DOUBLE_MILLS:
+#         flag = 1
+#         for i in mill:
+#             if state.get_value(i) != player:
+#                 flag = 0
+#         if flag:
+#             double_mills += 1
+#     return double_mills
+
+# def diff_double_mills(state):
+#     return num_of_double_mills(state,state.AI) - num_of_double_mills(state,state.PLAYER)
+
 def num_of_double_mills(state,player):
+    print(state)
     double_mills = 0
-    for mill in state.DOUBLE_MILLS:
+    for mill in state.SINGLE_MILLS:
         flag = 1
         for i in mill:
             if state.get_value(i) != player:
                 flag = 0
+                break
         if flag:
-            double_mills += 1
+            for i in mill:
+                for neighbour in state.NEIGHBOURS[i]:
+                    if state.get_value(neighbour) == "X":
+                        state.set_value(neighbour, player)
+                        state.set_value(i, "X")
+
+                        if is_mill(state,player,neighbour):
+                            double_mills += 1
+
+                        #Vratim kako je bilo
+                        state.set_value(i, player)
+                        state.set_value(neighbour, "X")                
     return double_mills
 
 def diff_double_mills(state):
@@ -213,23 +264,23 @@ def winning_configuration(state):
 
 def eval(state, state_before, phase):
 
-    if phase == 1:    #18 26 1 6 21 7
+    if phase == 1:    #18 26 1 6 12 7 
         evaluation = \
             18 * closed_mill(state, state_before) + \
             26 * mill_diff(state) + \
             1 * diff_blocked_figures(state) + \
             6 * figures_diff(state) + \
-            21 * diff_two_piece_config(state) + \
+            12 * diff_two_piece_config(state) + \
             7 * diff_three_piece_config(state)
-    elif phase == 2:    #42 28 16 8 24 19 949  
+    elif phase == 2:    #14 43 10 8 7 42 1086 
         evaluation = \
-            42 * closed_mill(state, state_before) + \
-            28 * mill_diff(state) + \
-            16 * diff_blocked_figures(state) + \
+            14 * closed_mill(state, state_before) + \
+            43 * mill_diff(state) + \
+            10 * diff_blocked_figures(state) + \
             8 * figures_diff(state) + \
-            24 * opened_mills_diff(state) + \
-            19 * diff_double_mills(state) + \
-            949 * winning_configuration(state)
+            7 * opened_mills_diff(state) + \
+            42 * diff_double_mills(state) + \
+            1086 * winning_configuration(state)
             
     return evaluation
 

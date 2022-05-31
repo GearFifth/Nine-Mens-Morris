@@ -1,10 +1,39 @@
 import time
 import copy
 import evaluation
+import hashmap
 
 class State(object):
     AI = "⚪"
     PLAYER = "⚫"
+
+    NEIGHBOURS = hashmap.ChainedHashMap(50)
+    NEIGHBOURS.prime = 313
+    NEIGHBOURS[0] = [1,3]
+    NEIGHBOURS[1] = [0,2,9]
+    NEIGHBOURS[2] = [1.4]
+    NEIGHBOURS[3] = [0,5,11]
+    NEIGHBOURS[4] = [2,7,12]
+    NEIGHBOURS[5] = [3,6]
+    NEIGHBOURS[6] = [5,7,14]
+    NEIGHBOURS[7] = [4,6]
+    NEIGHBOURS[8] = [9,11]
+    NEIGHBOURS[9] = [1,8,10,17]
+    NEIGHBOURS[10] = [9,12]
+    NEIGHBOURS[11] = [3,8,13,19]
+    NEIGHBOURS[12] = [4,10,15,20]
+    NEIGHBOURS[13] = [11,14]
+    NEIGHBOURS[14] = [6,13,15,22]
+    NEIGHBOURS[15] = [12,14]
+    NEIGHBOURS[16] = [17,19]
+    NEIGHBOURS[17] = [9,16,18]
+    NEIGHBOURS[18] = [17,20]
+    NEIGHBOURS[19] = [11,16,21]
+    NEIGHBOURS[20] = [12,18,23]
+    NEIGHBOURS[21] = [19,22]
+    NEIGHBOURS[22] = [14,21,23]
+    NEIGHBOURS[23] = [20,22]
+
 
     NEIGHBOURS = {
         0: [1,3], 1: [0,2,9], 2: [1,4], 3: [0,5,11],
@@ -106,9 +135,9 @@ class State(object):
     def is_end(self): #vraca format bool, pobednik
         white_blocked, black_blocked = evaluation.blocked_figures(self)
         if self.white_figures == 2 or self.white_figures == white_blocked:
-            return True, "PLAYER"
+            return True, State.PLAYER
         elif self.black_figures == 2 or self.black_figures == black_blocked:
-            return True, "AI"
+            return True, State.AI
         else:
             return False, None      
 

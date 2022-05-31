@@ -175,7 +175,7 @@ class Game(object):
         return max_eval, max_index, max_neighbour
 
 
-    def min2(self, depth, alpha, beta):
+    def min2(self, depth, alpha, beta): #RADI DOBRO
         min_eval = float(+inf)
         min_index = None    #polje na kojem se nalazi figura
         min_neighbour = None    #Polje na koje se pomera figura
@@ -194,7 +194,7 @@ class Game(object):
                         self.current_state.set_value(neighbour, State.PLAYER)
                         self.current_state.set_value(i,"X")
 
-                        if evaluation.closed_mill(self.current_state, self.state_before) == 1:
+                        if evaluation.closed_mill(self.current_state, self.state_before) == -1:
                             eval, index = self.min_remove(depth-1,alpha,beta)
                         else:
                             eval, index, ret2 = self.max2(depth-1,alpha,beta)
@@ -357,6 +357,7 @@ class Game(object):
         print("--- %s seconds ---" % (time.time() - start_time))
 
         self.current_state.set_value(index, State.AI)
+        print("Postavljena je figura na poziciju '{}'".format(index))
         self.current_state.placed_figures[State.AI] += 1
 
         if evaluation.is_mill(self.current_state, State.AI, index):
@@ -388,6 +389,9 @@ class Game(object):
                         if self.current_state.get_value(i) == "X":
                             possible_moves.append(i)
                     break
+                else:
+                    print("Na ovom polju se ne nalazi vaša figura!")
+                    continue
             except:
                 print("Unos nije dobar!")
         while True:
@@ -460,6 +464,12 @@ class Game(object):
         self.state_before = copy.deepcopy(self.current_state)
         self.current_state.set_value(index,"X")   
 
+    def check_winner(self):
+        result, winner = self.current_state.is_end()
+        if result == True:
+            print("*"*30 + "\n\n" "Pobednik je: " + winner + "!\n\n" + "*"*30 + "\n")
+            return True
+
     def play(self):
         self.initialize_game()
 
@@ -477,20 +487,22 @@ class Game(object):
             
 
         #FAZA 2
+        self.phase = 2
         print("\n" + "*"*30 + " FAZA 2 " + "*"*30 + "\n")
         while True:
-            result, winner = self.current_state.is_end()
-
-            if result == True:
-                print("*"*30 + "\n\n" "Pobednik je: " + winner + "!\n\n" + "*"*30 + "\n")
+            if self.check_winner():
                 break
 
             if self.player_turn == State.PLAYER:
                 if self.phase_two_player() == "X":
                     break
+                if self.check_winner():
+                    break
                 self.phase_two_ai()
             elif self.player_turn == State.AI:
-                self.phase_two_ai()      
+                self.phase_two_ai()
+                if self.check_winner():
+                    break
                 if self.phase_two_player()  == "X":
                     break
         print("*"*20 + " KRAJ IGRE " + "*"*20)
