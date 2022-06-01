@@ -194,7 +194,6 @@ def diff_three_piece_config(state):
 #     return num_of_double_mills(state,state.AI) - num_of_double_mills(state,state.PLAYER)
 
 def num_of_double_mills(state,player):
-    print(state)
     double_mills = 0
     for mill in state.SINGLE_MILLS:
         flag = 1
