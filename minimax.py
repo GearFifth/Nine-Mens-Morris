@@ -5,6 +5,7 @@ import copy
 import time
 
 DEPTH = 4
+DEPTH2 = 5
 ALPHA = float(-inf)
 BETA = float(inf)
 
@@ -352,9 +353,7 @@ class Game(object):
     def phase_one_ai(self):
         self.state_before = copy.deepcopy(self.current_state)
 
-        start_time = time.time()
         eval, index = self.max(DEPTH, ALPHA, BETA)
-        print("--- %s seconds ---" % (time.time() - start_time))
 
         self.current_state.set_value(index, State.AI)
         print("Postavljena je figura na poziciju '{}'".format(index))
@@ -362,7 +361,9 @@ class Game(object):
 
         if evaluation.is_mill(self.current_state, State.AI, index):
             print(self.current_state)
-            eval2, index2 = self.max_remove(DEPTH - 1, ALPHA, BETA)
+
+            eval2, index2 = self.max_remove(DEPTH , ALPHA, BETA)
+
             self.remove_figure(index2)
             print("Skinuta je figura na poziciji", index2)
         # print(self.current_state)
@@ -388,10 +389,13 @@ class Game(object):
                     for i in potential_possible_moves:
                         if self.current_state.get_value(i) == "X":
                             possible_moves.append(i)
-                    break
                 else:
                     print("Na ovom polju se ne nalazi vaša figura!")
                     continue
+                if len(possible_moves) == 0:
+                    print("Ova figura je blokirana!")
+                    continue
+                break
             except:
                 print("Unos nije dobar!")
         while True:
@@ -437,9 +441,7 @@ class Game(object):
     def phase_two_ai(self):
         self.state_before = copy.deepcopy(self.current_state)
 
-        start_time = time.time()
-        eval, index, neighbour = self.max2(DEPTH, ALPHA, BETA)
-        print("--- %s seconds ---" % (time.time() - start_time))
+        eval, index, neighbour = self.max2(DEPTH2, ALPHA, BETA)
 
         self.current_state.set_value(neighbour, State.AI)
         self.current_state.set_value(index, "X")
@@ -447,7 +449,9 @@ class Game(object):
        
         if evaluation.is_mill(self.current_state, State.AI, neighbour):
             print(self.current_state)
-            eval2, index2 = self.max_remove(DEPTH - 1, ALPHA, BETA)
+
+            eval2, index2 = self.max_remove(DEPTH2, ALPHA, BETA)
+
             self.remove_figure(index2)  
             print("Skinuta je figura na poziciji", index2)     
         # print(self.current_state)
@@ -479,9 +483,16 @@ class Game(object):
             if self.player_turn == State.PLAYER:
                 if self.phase_one_player() == "X":
                     break
+
+                start_time = time.time()
                 self.phase_one_ai()
+                print("--- %s seconds ---" % (time.time() - start_time))
+
             elif self.player_turn == State.AI:
+                start_time = time.time()
                 self.phase_one_ai()
+                print("--- %s seconds ---" % (time.time() - start_time))
+
                 if self.phase_one_player() == "X":
                     break
             
@@ -498,9 +509,17 @@ class Game(object):
                     break
                 if self.check_winner():
                     break
+
+                start_time = time.time()
                 self.phase_two_ai()
+                print("--- %s seconds ---" % (time.time() - start_time))
+
             elif self.player_turn == State.AI:
+
+                start_time = time.time()
                 self.phase_two_ai()
+                print("--- %s seconds ---" % (time.time() - start_time))
+
                 if self.check_winner():
                     break
                 if self.phase_two_player()  == "X":
