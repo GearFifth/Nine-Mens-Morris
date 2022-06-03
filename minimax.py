@@ -25,7 +25,7 @@ class Game(object):
         self.state_before = copy.deepcopy(self.current_state)
         print("\n"*2 + "*"*30 + " MICE " + "*"*30 + "\n")
         while True:
-            user_input = input("Da li želite prvi da igrate?\n(Unesite 'da' ili 'ne'): ")
+            user_input = input("Da li zelite prvi da igrate?\n(Unesite 'da' ili 'ne'): ")
             if self.check_first_player_input(user_input) == True:
                 if user_input.upper() == "DA":
                     self.player_turn = State.PLAYER
@@ -66,7 +66,9 @@ class Game(object):
 
 
                 if evaluation.closed_mill(self.current_state, self.state_before) == 1:
+                    self.current_state.made_mills[State.AI] += 1
                     eval, index = self.max_remove(depth-1,alpha,beta)
+                    self.current_state.made_mills[State.AI] -= 1
                 else:
                     if self.current_state.placed_figures[State.PLAYER] == 9:    #Ako su postavljene sve figure prelazi na fazu 2
                         self.phase = 2
@@ -106,7 +108,9 @@ class Game(object):
                 self.current_state.placed_figures[State.PLAYER] += 1
 
                 if evaluation.closed_mill(self.current_state, self.state_before) == -1:
+                    self.current_state.made_mills[State.PLAYER] += 1
                     eval, index = self.min_remove(depth-1,alpha,beta)
+                    self.current_state.made_mills[State.PLAYER] -= 1
                 else:
                     if self.current_state.placed_figures[State.AI] == 9:    #Ako su postavljene sve figure prelazi na fazu 2
                         self.phase = 2
@@ -155,7 +159,9 @@ class Game(object):
                         self.current_state.set_value(i,"X")
 
                         if evaluation.closed_mill(self.current_state, self.state_before) == 1:
+                            self.current_state.made_mills[State.AI] += 1
                             eval, index = self.max_remove(depth-1,alpha,beta)
+                            self.current_state.made_mills[State.AI] -= 1
                         else:
                             eval, index, ret2 = self.min2(depth-1,alpha,beta)
 
@@ -196,7 +202,9 @@ class Game(object):
                         self.current_state.set_value(i,"X")
 
                         if evaluation.closed_mill(self.current_state, self.state_before) == -1:
+                            self.current_state.made_mills[State.PLAYER] += 1
                             eval, index = self.min_remove(depth-1,alpha,beta)
+                            self.current_state.made_mills[State.PLAYER] -= 1
                         else:
                             eval, index, ret2 = self.max2(depth-1,alpha,beta)
 
@@ -315,7 +323,7 @@ class Game(object):
     def phase_one_player(self):
         print(self.current_state)
         while True:
-            user_input = input("Unesite polje na koje želite da postavite figuru (Unesite 'X' za prekid igre): ")
+            user_input = input("Unesite polje na koje zelite da postavite figuru (Unesite 'X' za prekid igre): ")
             if user_input.upper() == "X":
                 return "X"
             if self.current_state.is_move_valid(user_input):
@@ -329,7 +337,7 @@ class Game(object):
                 continue
         if evaluation.closed_mill(self.current_state, self.state_before) == -1:
             while True:
-                user_input2 = input("Unesite polje sa kojeg želite da skinete figuru (Unesite 'X' za prekid igre): ")
+                user_input2 = input("Unesite polje sa kojeg zelite da skinete figuru (Unesite 'X' za prekid igre): ")
                 if user_input2.upper() == "X":
                     return "X"
                 try:
@@ -337,7 +345,7 @@ class Game(object):
                     if self.current_state.get_value(user_input2) == State.AI:
                         free_figures = evaluation.are_there_non_mill_figures(self.current_state,self.current_state.AI)
                         if free_figures and evaluation.is_mill(self.current_state,self.current_state.AI,user_input2):
-                            print("Ne možete pojesti ovu figuru!")
+                            print("Ne mozete pojesti ovu figuru!")
                             continue
                         self.remove_figure(user_input2)
                         break
@@ -378,7 +386,7 @@ class Game(object):
     def phase_two_player(self):
         print(self.current_state)
         while True:
-            user_input1 = input("Unesite broj polja na kojem se nalazi figura koju želite da pomerite (Unesite 'X' za prekid igre): ")
+            user_input1 = input("Unesite broj polja na kojem se nalazi figura koju zelite da pomerite (Unesite 'X' za prekid igre): ")
             if user_input1.upper() == "X":
                 return "X"
             try:
@@ -390,7 +398,7 @@ class Game(object):
                         if self.current_state.get_value(i) == "X":
                             possible_moves.append(i)
                 else:
-                    print("Na ovom polju se ne nalazi vaša figura!")
+                    print("Na ovom polju se ne nalazi vasa figura!")
                     continue
                 if len(possible_moves) == 0:
                     print("Ova figura je blokirana!")
@@ -399,7 +407,7 @@ class Game(object):
             except:
                 print("Unos nije dobar!")
         while True:
-            user_input2 = input("Unesite polje na koje želite da pomerite figuru (moguća polja su {}) (Unesite 'X' za prekid igre): ".format(possible_moves))
+            user_input2 = input("Unesite polje na koje zelite da pomerite figuru (moguca polja su {}) (Unesite 'X' za prekid igre): ".format(possible_moves))
             if user_input2.upper() == "X":
                 return "X"
             try:
@@ -411,14 +419,14 @@ class Game(object):
                     print(self.current_state)
                     break
                 else:
-                    print("Morate izabrati neki od ponuđenih polja!")
+                    print("Morate izabrati neki od ponudjenih polja!")
                     continue
             except:
                 print("Nije dobar unos!")
                 continue
         if evaluation.closed_mill(self.current_state, self.state_before) == -1:
             while True:
-                user_input3 = input("Unesite polje sa kojeg želite da skinete figuru (Unesite 'X' za prekid igre): ")
+                user_input3 = input("Unesite polje sa kojeg zelite da skinete figuru (Unesite 'X' za prekid igre): ")
                 if user_input3.upper() == "X":
                     return "X"
                 try:
@@ -426,7 +434,7 @@ class Game(object):
                     if self.current_state.get_value(user_input3) == State.AI:
                         free_figures = evaluation.are_there_non_mill_figures(self.current_state,self.current_state.AI)
                         if free_figures and evaluation.is_mill(self.current_state,self.current_state.AI,user_input3):
-                            print("Ne možete pojesti ovu figuru!")
+                            print("Ne mozete pojesti ovu figuru!")
                             continue
                         self.remove_figure(user_input3)
                         break

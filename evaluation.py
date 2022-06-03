@@ -63,6 +63,9 @@ def closed_mill(state, state_before):
 
     #     return 0
 
+def closed_mill_diff(state):
+    return state.made_mills[state.AI] - state.made_mills[state.PLAYER]
+
 def get_list_of_mills(state,player):
     mills = []
     for mill in state.SINGLE_MILLS:
@@ -265,7 +268,7 @@ def eval(state, state_before, phase):
 
     if phase == 1:    #18 26 1 6 12 7 
         evaluation = \
-            18 * closed_mill(state, state_before) + \
+            18 * closed_mill_diff(state) + \
             26 * mill_diff(state) + \
             1 * diff_blocked_figures(state) + \
             6 * figures_diff(state) + \
@@ -273,7 +276,7 @@ def eval(state, state_before, phase):
             7 * diff_three_piece_config(state)
     elif phase == 2:    #14 43 10 8 7 42 1086 
         evaluation = \
-            14 * closed_mill(state, state_before) + \
+            14 * closed_mill_diff(state) + \
             43 * mill_diff(state) + \
             10 * diff_blocked_figures(state) + \
             8 * figures_diff(state) + \

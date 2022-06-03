@@ -1,5 +1,5 @@
 """
-Modul sadrži implementaciju asocijativnog niza
+Modul sadrzi implementaciju asocijativnog niza
 """
 
 
@@ -35,32 +35,32 @@ class Map(object):
 
     def __getitem__(self, key):
         """
-        Pristup elementu sa zadatim ključem
+        Pristup elementu sa zadatim kljucem
 
-        Metoda vrši pristup elementu sa zadatim ključem. U slučaju
-        da element postoji u mapi, metoda vraća njegovu vrednost, dok
-        u suprotnom podiže odgovarajući izuzetak.
+        Metoda vrsi pristup elementu sa zadatim kljucem. U slucaju
+        da element postoji u mapi, metoda vraca njegovu vrednost, dok
+        u suprotnom podize odgovarajuci izuzetak.
 
         Argument:
-        - `key`: ključ elementa kome se pristupa
+        - `key`: kljuc elementa kome se pristupa
         """
         for item in self._data:
             if key == item.key:
                 return item.value
 
-        raise KeyError('Ne postoji element sa ključem %s' % str(key))
+        raise KeyError('Ne postoji element sa kljucem %s' % str(key))
 
     def __setitem__(self, key, value):
         """
-        Postavljanje vrednosti elementa sa zadatim ključem
+        Postavljanje vrednosti elementa sa zadatim kljucem
 
-        Metoda najpre pretražuje postojeće elemente po vrednosti ključa.
-        Ukoliko traženi ključ već postoji, vrši se ažuriranje vrednosti
-        postojećeg elementa. U suprotnom, kreira se novi element koji se
+        Metoda najpre pretrazuje postojece elemente po vrednosti kljuca.
+        Ukoliko trazeni kljuc vec postoji, vrsi se azuriranje vrednosti
+        postojeceg elementa. U suprotnom, kreira se novi element koji se
         dodaje u mapu.
 
         Argumenti:
-        - `key`: ključ elementa koji se kreira ili ažurira
+        - `key`: kljuc elementa koji se kreira ili azurira
         - `value`: nova vrednost elementa
         """
         for item in self._data:
@@ -68,19 +68,19 @@ class Map(object):
                 item.value = value
                 return
 
-        # element nije pronađen, zapiši ga u mapu
+        # element nije pronadjen, zapisi ga u mapu
         self._data.append(MapElement(key, value))
 
     def __delitem__(self, key):
         """
-        Brisanje elementa sa zadatim ključem
+        Brisanje elementa sa zadatim kljucem
 
-        Metoda pretražuje elemente po vrednosti ključa. Ukoliko element
-        sa zadatim ključem postoji u mapi, vrši se njegovo brisanje. U
-        suprotnom se podiže odgovarajući izuzetak.
+        Metoda pretrazuje elemente po vrednosti kljuca. Ukoliko element
+        sa zadatim kljucem postoji u mapi, vrsi se njegovo brisanje. U
+        suprotnom se podize odgovarajuci izuzetak.
 
         Argument:
-        - `key`: ključ elementa za brisanje
+        - `key`: kljuc elementa za brisanje
         """
         length = len(self._data)
         for i in range(length):
@@ -88,17 +88,17 @@ class Map(object):
                 self._data.pop(i)
                 return
 
-        raise KeyError('Ne postoji element sa ključem %s' % str(key))
+        raise KeyError('Ne postoji element sa kljucem %s' % str(key))
 
     def __len__(self):
         return len(self._data)
 
     def __contains__(self, key):
         """
-        Metoda vrši proveru postojanja ključa u mapi
+        Metoda vrsi proveru postojanja kljuca u mapi
 
         Argument:
-        - `key`: ključ koji se traži
+        - `key`: kljuc koji se trazi
         """
         for item in self._data:
             if key == item.key:
@@ -116,7 +116,7 @@ class Map(object):
 
     def keys(self):
         """
-        Metoda vraća sve ključeve u mapi
+        Metoda vraca sve kljuceve u mapi
         """
         keys = []
         for key in self:
@@ -126,7 +126,7 @@ class Map(object):
 
     def values(self):
         """
-        Metoda vraća sve vrednosti u mapi
+        Metoda vraca sve vrednosti u mapi
         """
         values = []
         for key in self:
@@ -154,9 +154,9 @@ if __name__ == '__main__':
 
     # metoda __contains__
     if 'y' in table:
-        print('Tabela sadrži ključ y.')
+        print('Tabela sadrzi kljuc y.')
     else:
-        print('Tabela ne sadrži ključ y.')
+        print('Tabela ne sadrzi kljuc y.')
 
     # iteracija kroz tabelu
     for item in table:

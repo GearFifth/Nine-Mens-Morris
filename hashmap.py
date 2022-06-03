@@ -1,5 +1,5 @@
 """
-Modul sadrži implementacije heš mape
+Modul sadrzi implementacije hes mape
 """
 import random
 
@@ -8,7 +8,7 @@ from map import Map, MapElement
 
 class HashMap(object):
     """
-    Klasa modeluje heš mapu
+    Klasa modeluje hes mapu
     """
 
     def __init__(self, capacity=8):
@@ -17,14 +17,14 @@ class HashMap(object):
 
         Argumenti:
         - `capacity`: inicijalni broj mesta u lookup nizu
-        - `prime`: prost broj neophodan heš funkciji
+        - `prime`: prost broj neophodan hes funkciji
         """
         self._data = capacity * [None]
         self._capacity = capacity
         self._size = 0
         self.prime = 109345121
 
-        # konstante heširanja
+        # konstante hesiranja
         self._a = 1 + random.randrange(self.prime-1)
         self._b = random.randrange(self.prime)
 
@@ -33,12 +33,12 @@ class HashMap(object):
 
     def _hash(self, x):
         """
-        Heš funkcija
+        Hes funkcija
 
-        Izračunavanje heš koda vrši se po formuli (ax + b) mod p.
+        Izracunavanje hes koda vrsi se po formuli (ax + b) mod p.
 
         Argument:
-        - `x`: vrednost čiji se kod računa
+        - `x`: vrednost ciji se kod racuna
         """
         hashed_value = (hash(x)*self._a + self._b) % self.prime
         compressed = hashed_value % self._capacity
@@ -46,7 +46,7 @@ class HashMap(object):
 
     def _resize(self, capacity):
         """
-        Skaliranje broja raspoloživih slotova
+        Skaliranje broja raspolozivih slotova
 
         Metoda kreira niz sa unapred zadatim kapacitetom u koji
         se prepisuju vrednosti koje se trenutno nalaze u tabeli.
@@ -64,14 +64,14 @@ class HashMap(object):
 
     def __getitem__(self, key):
         """
-        Pristup elementu sa zadatim ključem
+        Pristup elementu sa zadatim kljucem
 
         Apstraktna metoda koja opisuje pristup elementu na osnovu
-        njegovog ključa. Implementacija pristupa bucketu varira u
-        zavisnosti od načina rešavanja kolizija.
+        njegovog kljuca. Implementacija pristupa bucketu varira u
+        zavisnosti od nacina resavanja kolizija.
 
         Argument:
-        - `key`: ključ elementa kome se pristupa
+        - `key`: kljuc elementa kome se pristupa
         """
         bucket_index = self._hash(key)
         return self._bucket_getitem(bucket_index, key)
@@ -80,7 +80,7 @@ class HashMap(object):
         bucket_index = self._hash(key)
         self._bucket_setitem(bucket_index, key, value)
 
-        # povećaj broj raspoloživih mesta
+        # povecaj broj raspolozivih mesta
         current_capacity = len(self._data)
         if self._size > current_capacity // 2:
             self._resize(2*current_capacity - 1)
@@ -119,46 +119,46 @@ class HashMap(object):
 
 class ChainedHashMap(HashMap):
     """
-    Klasa modeluje heš mapu koja kolizije rešava ulančavanjem
+    Klasa modeluje hes mapu koja kolizije resava ulancavanjem
     """
     def _bucket_getitem(self, i, key):
         """
         Pristup elementu u okviru bucketa
 
         Metoda najpre pristupa bucketu sa zadatim indeksom. Ukoliko
-        bucket postoji, pretražuje se. Ako je element pronađen metoda
-        vraća njegovu vrednostu, dok se u suprotnom podiže odgovarajući
+        bucket postoji, pretrazuje se. Ako je element pronadjen metoda
+        vraca njegovu vrednostu, dok se u suprotnom podize odgovarajuci
         izuzetak.
 
         Argumenti:
         - `i`: indeks bucketa
-        - `key`: ključ elementa
+        - `key`: kljuc elementa
         """
         bucket = self._data[i]
         if bucket is None:
-            raise KeyError('Ne postoji element sa traženim ključem.')
+            raise KeyError('Ne postoji element sa trazenim kljucem.')
 
         return bucket[key]
 
     def _bucket_setitem(self, bucket_index, key, value):
         """
-        Postavljanje vrednosti elementa sa zadatim ključem
+        Postavljanje vrednosti elementa sa zadatim kljucem
 
         Metoda najpre pronalazi bucket sa zadatim indeksom, a zatim
-        dodaje novi element ili ažurira postojeći na osnovu zadatog
-        ključa. Ukoliko bucket ne postoji, kreira se novi.
+        dodaje novi element ili azurira postojeci na osnovu zadatog
+        kljuca. Ukoliko bucket ne postoji, kreira se novi.
 
         Argumenti:
         - `i`: indeks bucketa
-        - `key`: ključ elementa
+        - `key`: kljuc elementa
         - `value`: vrednost elementa
         """
         bucket = self._data[bucket_index]
         if bucket is None:
             self._data[bucket_index] = Map()
 
-        # broj elemenata u mapi se menja samo u slučaju da je došlo do
-        # dodavanja, dok ažuriranje ne menja broj elemenata
+        # broj elemenata u mapi se menja samo u slucaju da je doslo do
+        # dodavanja, dok azuriranje ne menja broj elemenata
         current_size = len(self._data[bucket_index])
         self._data[bucket_index][key] = value
         if len(self._data[bucket_index]) > current_size:
@@ -166,20 +166,20 @@ class ChainedHashMap(HashMap):
 
     def _bucket_delitem(self, bucket_index, key):
         """
-        Brisanje elementa sa zadatim ključem
+        Brisanje elementa sa zadatim kljucem
 
         Metoda najpre pristupa bucketu sa zadatim indeksom. Ukoliko
-        bucket postoji, pretražuje se. Ako je element pronađen vrši
-        se njegovo brisanje, u suprotnom se podiže odgovarajući
+        bucket postoji, pretrazuje se. Ako je element pronadjen vrsi
+        se njegovo brisanje, u suprotnom se podize odgovarajuci
         izuzetak.
 
         Argumenti:
         - `i`: indeks bucketa
-        - `key`: ključ elementa
+        - `key`: kljuc elementa
         """
         bucket = self._data[bucket_index]
         if bucket is None:
-            raise KeyError('Ne postoji element sa traženim ključem.')
+            raise KeyError('Ne postoji element sa trazenim kljucem.')
 
         del bucket[key]
 

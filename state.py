@@ -108,6 +108,7 @@ class State(object):
         self.black_figures = 9      #PLAYER
         self.white_figures = 9      #AI
         self.placed_figures = {self.PLAYER: 0, self.AI: 0}
+        self.made_mills = {self.PLAYER: 0, self.AI: 0}  #Pomocni dictionary za vecu dubinu
 
     def get_value(self, i):
         return self.board[int(i)]
