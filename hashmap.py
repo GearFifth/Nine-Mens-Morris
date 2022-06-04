@@ -44,23 +44,23 @@ class HashMap(object):
         compressed = hashed_value % self._capacity
         return compressed
 
-    def _resize(self, capacity):
-        """
-        Skaliranje broja raspolozivih slotova
+    # def _resize(self, capacity):
+    #     """
+    #     Skaliranje broja raspolozivih slotova
 
-        Metoda kreira niz sa unapred zadatim kapacitetom u koji
-        se prepisuju vrednosti koje se trenutno nalaze u tabeli.
+    #     Metoda kreira niz sa unapred zadatim kapacitetom u koji
+    #     se prepisuju vrednosti koje se trenutno nalaze u tabeli.
 
-        Argument:
-        - `capacity`: kapacitet novog niza
-        """
-        old_data = list(self.items())
-        self._data = capacity * [None]
-        self._size = 0
+    #     Argument:
+    #     - `capacity`: kapacitet novog niza
+    #     """
+    #     old_data = list(self.items())
+    #     self._data = capacity * [None]
+    #     self._size = 0
 
-        # prepisivanje podataka u novu tabelu
-        for (k, v) in old_data:
-            self[k] = v
+    #     # prepisivanje podataka u novu tabelu
+    #     for (k, v) in old_data:
+    #         self[k] = v
 
     def __getitem__(self, key):
         """
@@ -80,10 +80,10 @@ class HashMap(object):
         bucket_index = self._hash(key)
         self._bucket_setitem(bucket_index, key, value)
 
-        # povecaj broj raspolozivih mesta
-        current_capacity = len(self._data)
-        if self._size > current_capacity // 2:
-            self._resize(2*current_capacity - 1)
+        # # povecaj broj raspolozivih mesta
+        # current_capacity = len(self._data)
+        # if self._size > current_capacity // 2:
+        #     self._resize(2*current_capacity - 1)
 
     def __delitem__(self, key):
         bucket_index = self._hash(key)
